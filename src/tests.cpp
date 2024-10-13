@@ -63,7 +63,7 @@ char* my_strstr(char *s, char *p) {
         ++s; 
     }
     return nullptr; 
-    std::cout << "qq" ;
+    
 }
 
 
