@@ -1,5 +1,8 @@
 #include "tests.h"
-
+#include <vector>
+#include <algorithm>
+#include <cstring>
+#include <iostream>
 // 练习1，实现库函数strlen
 int my_strlen(char *str) {
     /**
@@ -7,19 +10,36 @@ int my_strlen(char *str) {
      */
 
     // IMPLEMENT YOUR CODE HERE
-    return 0;
+int length = 0;
+while (str[length] != '\0'){
+    ++length;
 }
-
-
+return length;
+}
 // 练习2，实现库函数strcat
 void my_strcat(char *str_1, char *str_2) {
-    /**
+ /**
      * 将字符串str_2拼接到str_1之后，我们保证str_1指向的内存空间足够用于添加str_2。
      * 注意结束符'\0'的处理。
      */
 
-    // IMPLEMENT YOUR CODE HERE
+    // IMPLEMENT YOUR CODE HERE  
+while (*str_1) {
+        str_1++;
 }
+while (*str_2) {
+        *str_1 = *str_2;
+        str_1++;
+        str_2++;
+    }
+*str_1 = '\0';
+}
+
+
+
+
+std::cout <<"1" ;
+
 
 
 // 练习3，实现库函数strstr
@@ -31,7 +51,18 @@ char* my_strstr(char *s, char *p) {
      */
 
     // IMPLEMENT YOUR CODE HERE
-    return 0;
+
+    int plen = 0;
+    while (p[plen] != '\0') {
+        ++plen;
+    }
+    while (*s != '\0') {
+        if (strncmp(s, p, plen) == 0) {
+            return s;
+}
+        ++s; 
+    }
+    return nullptr; 
 }
 
 
@@ -97,6 +128,19 @@ void rgb2gray(float *in, float *out, int h, int w) {
 
     // IMPLEMENT YOUR CODE HERE
     // ...
+    for(int i =0; i<h; ++i){
+        for(int j = 0;j<w;++j){
+            int index = i*w*3+j*3;
+            float R = in[index];
+            float G = in[index+1];
+            float B = in[index+2];
+            
+            float V = 0.1140*B+0.5870*G+0.2989*R;
+            
+            out[i*w+j] = V;
+            
+            }
+    }
 }
 
 // 练习5，实现图像处理算法 resize：缩小或放大图像
@@ -118,7 +162,7 @@ void resize(float *in, float *out, int h, int w, int c, float scale) {
      *
      *      则满足下面的条件：
      *                    x2 - x          x - x1
-     *          v = v1 * ———————— + v2 * ————————
+     *          v = v2 * ———————— + v1 * ————————
      *                    x2 - x1         x2 - x1
      *      也就是说，v的值是 点1 和 点2 的值的加权平均值，权重与到两点的距离相关
      *      (公式中的 x也可以是 y，因为是在一条直线上)。
@@ -195,14 +239,38 @@ void resize(float *in, float *out, int h, int w, int c, float scale) {
      *     3. 注意上面的方法中，四个邻居点的坐标可能会超出 src 的范围，
      *        所以需要对其进行边界检查
      */
+int new_h = static_cast<int>(h * scale);
+    int new_w = static_cast<int>(w * scale);
 
-    int new_h = h * scale, new_w = w * scale;
-    // IMPLEMENT YOUR CODE HERE
+    for (int i = 0; i < new_h; ++i) {
+        for (int j = 0; j < new_w; ++j) {
+            float x = j / scale;
+            float y = i / scale;
+            int x1 = static_cast<int>(x);
+            int y1 = static_cast<int>(y);
+            int x2 = (x1 + 1) < w ? x1 + 1 : x1;
+            int y2 = (y1 + 1) < h ? y1 + 1 : y1;
+            float dx = x - x1;
+            float dy = y - y1;
 
+            for (int k = 0; k < c; ++k) {
+                float value = static_cast<float>(
+                    (1 - dx) * (1 - dy) * in[(y1 * w + x1) * c + k] +
+                    dx * (1 - dy) * in[(y1 * w + x2) * c + k] +
+                    (1 - dx) * dy * in[(y2 * w + x1) * c + k] +
+                    dx * dy * in[(y2 * w + x2) * c + k]
+                );
+                int out_index = (i * new_w + j) * c + k;
+                out[out_index] = value;
+            }
+        }
+    }
 }
 
 
 // 练习6，实现图像处理算法：直方图均衡化
+ 
+ 
 void hist_eq(float *in, int h, int w) {
     /**
      * 将输入图片进行直方图均衡化处理。参数含义：
@@ -217,8 +285,21 @@ void hist_eq(float *in, int h, int w) {
      * 提示：
      * (1) 输入图片是灰度图，每个像素值是[0, 255]内的小数
      * (2) 灰度级个数为256，也就是{0, 1, 2, 3, ..., 255}
-     * (3) 使用数组来实现灰度级 => 灰度级的映射
-     */
-
-    // IMPLEMENT YOUR CODE HERE
+     * (3) 使用数组来实现灰度级 => 灰度级的映射*/
+      // IMPLEMENT YOUR CODE HERE
+      
+      std::vector<int>hist(256, 0);
+      for (int i = 0;i<h*w; ++i){
+        hist[static_cast<int>(in[i])]++;
+      }
+      std::vector<float>cum_hist(256,0);
+      int total_pixels = h*w;
+      cum_hist[0] = static_cast<float>(hist[0])/total_pixels;
+      for (int i = 1;i < 256; ++i){
+        cum_hist[i] = cum_hist[i - 1] + static_cast<float>(hist[i])/total_pixels;
+      }
+      for (int i= 0;i<h*w; ++i){
+        in[i] = static_cast<float>(cum_hist[static_cast<int>(in[i])])*255.0f;
+      }
 }
+

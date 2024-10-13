@@ -4,8 +4,6 @@
 #include <cstring>
 
 
-
-
 void test_rgb2gray() {
     std::cout << "开始测试函数 << rgb2gray >> ..." << std::endl;
     char *path = "../images/rgb2gray/input.jpg";
@@ -72,6 +70,9 @@ void test_strcat() {
 
     strcat(str1, str2);
     my_strcat(str1_tmp, str2_tmp);
+    std::cout<<str1<<std::endl;
+    std::cout<<"---------------------------"<<std::endl;
+    std::cout<<str1_tmp<<std::endl;
 
     if (!strcmp(str1, str1_tmp)) {
         std::cout << "通过" << std::endl;
@@ -162,7 +163,7 @@ int main() {
     test_strcat();
     std::cout << "开始测试函数 << my_strstr >> ..." << std::endl;
     test_strstr();
-    std::cout << "开始测试函数 << rgb2gray >> ..." << std::endl;
+    std::cout << "开始测试函数 << hist_eq >> ..." << std::endl;
     test_rgb2gray();
     std::cout << "开始测试函数 << resize >> ..." << std::endl;
     test_resize();
